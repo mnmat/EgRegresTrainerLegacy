@@ -324,7 +324,7 @@ RooPlot* ResPlotter::plotResComp(std::vector<ResFitter::Param>& fitParams,
     auto& fitParam = fitParams[fitNr];
     TGraph* graph = static_cast<TGraph*>(fitParam.plot->getHist("h_res"));
     setStyle(graph,fitNr);
-    fitParam.plot->getCurve("model_Norm[res]")->SetLineColor(getColour(fitNr));
+    fitParam.plot->getCurve("model_Norm[res]");
     fitParam.plot->remove("model_paramBox");
     fitParam.plot->SetTitle("");
 
