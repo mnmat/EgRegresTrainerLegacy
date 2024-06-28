@@ -112,9 +112,11 @@ CMSSWLIBS     = -L${CMSSW_BASE}/lib/${SCRAM_ARCH} -L${CMSSW_RELEASE_BASE}/lib/${
 #the first one in the directory, dont think this will matter
 #BOOST_DIR     = $(shell ls $$CMSSW_DATA_PATH/../external/boost/* -d  | head -n 1)
 
-BOOST_DIR = /cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/boost/1.80.0-4cd38fdff5968e5982e4cdb77de73b18
+BOOST_DIR     = $(shell ls /cvmfs/cms.cern.ch/${SCRAM_ARCH}/external/boost/* -d  | tail -n 1)
 
-CXXFLAGS     += $(ROOTCFLAGS) -I$(INCLUDE_DIR) $(CMSSWFLAGS)  -fexceptions  -I$(BOOST_DIR)/include -I/cvmfs/cms.cern.ch/${SCRAM_ARCH}/cms/vdt/0.4.3-5a80085534117eaccb28e669c6da4b6f/include/
+VDT_VERSION = $(shell ls /cvmfs/cms.cern.ch/${SCRAM_ARCH}/cms/vdt -f | tail -n 1)
+
+CXXFLAGS     += $(ROOTCFLAGS) -I$(INCLUDE_DIR) $(CMSSWFLAGS)  -fexceptions  -I$(BOOST_DIR)/include -I/cvmfs/cms.cern.ch/${SCRAM_ARCH}/cms/vdt/${VDT_VERSION}/include/
 
 
 LIBS          = $(ROOTLIBS) $(SYSLIBS) $(USERLIBS) $(CMSSWLIBS)
