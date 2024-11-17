@@ -27,7 +27,8 @@ class RegArgs:
         self.target = "mc.energy/(sc.rawEnergy)"
         self.var_eb = "nrVert:sc.rawEnergy:sc.etaWidth:sc.phiWidth:ssFrac.e3x3/sc.rawEnergy:sc.seedClusEnergy/sc.rawEnergy:ssFrac.eMax/sc.rawEnergy:ssFrac.e2nd/sc.rawEnergy:ssFrac.eLeftRightDiffSumRatio:ssFrac.eTopBottomDiffSumRatio:ssFrac.sigmaIEtaIEta:ssFrac.sigmaIEtaIPhi:ssFrac.sigmaIPhiIPhi:sc.numberOfSubClusters:sc.clusterMaxDR:sc.clusterMaxDRDPhi:sc.clusterMaxDRDEta:sc.clusterMaxDRRawEnergy/sc.rawEnergy:clus1.clusterRawEnergy/sc.rawEnergy:clus2.clusterRawEnergy/sc.rawEnergy:clus3.clusterRawEnergy/sc.rawEnergy:clus1.clusterDPhiToSeed:clus2.clusterDPhiToSeed:clus3.clusterDPhiToSeed:clus1.clusterDEtaToSeed:clus2.clusterDEtaToSeed:clus3.clusterDEtaToSeed:sc.iEtaOrX:sc.iPhiOrY"
         self.var_ee = "nrVert:sc.rawEnergy:sc.etaWidth:sc.phiWidth:ssFrac.e3x3/sc.rawEnergy:sc.seedClusEnergy/sc.rawEnergy:ssFrac.eMax/sc.rawEnergy:ssFrac.e2nd/sc.rawEnergy:ssFrac.eLeftRightDiffSumRatio:ssFrac.eTopBottomDiffSumRatio:ssFrac.sigmaIEtaIEta:ssFrac.sigmaIEtaIPhi:ssFrac.sigmaIPhiIPhi:sc.numberOfSubClusters:sc.clusterMaxDR:sc.clusterMaxDRDPhi:sc.clusterMaxDRDEta:sc.clusterMaxDRRawEnergy/sc.rawEnergy:clus1.clusterRawEnergy/sc.rawEnergy:clus2.clusterRawEnergy/sc.rawEnergy:clus3.clusterRawEnergy/sc.rawEnergy:clus1.clusterDPhiToSeed:clus2.clusterDPhiToSeed:clus3.clusterDPhiToSeed:clus1.clusterDEtaToSeed:clus2.clusterDEtaToSeed:clus3.clusterDEtaToSeed:sc.iEtaOrX:sc.iPhiOrY:sc.seedEta"
-        self.cuts_base = "(mc.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0 && evt.eventnr%2==0)"
+        #self.cuts_base = "(mc.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0 && evt.eventnr%2==0)"
+        self.cut_base = ""
         self.ntrees = 1500
         self.do_eb = True
         self.isEB_temp = "(eg_eta>-1.414 && eg_eta<1.414)"
@@ -50,6 +51,15 @@ class RegArgs:
     def output_name(self):
         return "{}/{}_results.root".format(self.out_dir,self.name())
 
+    def set_sc_default_new(self):
+        self.target = "eg_gen_energy/rawEnergy"
+        self.var_eb = "nrHitsThreshold:eta:phiWidth:rvar:numberOfSubClusters:clusterMaxDR:rawEnergy"
+        self.var_ee = "nrHitsThreshold:eta:phiWidth:rvar:numberOfSubClusters:clusterMaxDR:rawEnergy"
+
+    def set_sc_extended_new(self):
+        self.target = "eg_gen_energy/rawEnergy"
+        self.var_eb = "nrVert:rawEnergy:etaWidth:phiWidth:rvar:energySeedCluster:energyFirstRecHit:energySecondRecHit:eLeftRightDiffSumRatio:eTopBottomDiffSumRatio:sigmaIEtaIEta:sigmaIEtaIPhi:sigmaIPhiIPhi:numberOfSubClusters:clusterMaxDR:clusterMaxDRDPhi:clusterMaxDRDEta:clusterMaxDREnergyFraction:subCluster1RawEnergyFraction:subCluster2RawEnergyFraction:subCluster3RawEnergyFraction:subCluster1DPhiToSeed:subCluster2DPhiToSeed:subCluster3DPhiToSeed:subCluster1DEtaToSeed:subCluster2DEtaToSeed:subCluster3DEtaToSeed:seedClusteriEtaOrX:seedClusteriPhiOrY"#:seedClusterEta"
+        self.var_ee = "rawEnergy:eta:etaWidth:phiWidth:numberOfSubClusters:nrRecHits:clusterMaxDR:dEtaSCToSeed:dPhiSCToSeed:firstRecHitEnergyFraction:secondRecHitEnergyFraction:sigma2uu:rvar:seedEnergyFraction:nrHitsThreshold:sigma2ww"#:sigma2vv"
 
     def set_sc_default(self):
         self.target = "eg_gen_energy/eg_rawEnergy"
@@ -108,8 +118,8 @@ Regression.1.VariablesEB: {args.var_eb}
 Regression.1.VariablesEE: {args.var_ee}
 Regression.1.Target: {args.target}
 Regression.1.CutBase: {args.cuts_base}
-Regression.1.CutEB: eg_isEB
-Regression.1.CutEE: eg_isEE
+Regression.1.CutEB: 
+Regression.1.CutEE: 
 Regression.1.MeanMin: {args.mean_min}
 Regression.1.MeanMax: {args.mean_max}
 Regression.1.FixMean: {args.fix_mean}
@@ -126,6 +136,8 @@ Regression.1.FixMean: {args.fix_mean}
         if not os.path.isdir(self.out_dir):
             os.mkdir(self.out_dir)
 
+
+        #self.tree_name = "egRegDataEcalHLTV1"
         self.do_eb = True
         self.make_cfg()
 
@@ -136,16 +148,109 @@ Regression.1.FixMean: {args.fix_mean}
         subprocess.Popen(["bin/"+arch+"/RegressionTrainerExe",self.cfg_name()]).communicate()
         forest_eb_file = self.output_name()
 
+        #self.tree_name = "egRegDataHGCALHLTV1"
         self.do_eb = False
         self.make_cfg()
         print ("starting: {}".format(self.name()))
         subprocess.Popen(["bin/"+arch+"/RegressionTrainerExe",self.cfg_name()]).communicate()
         forest_ee_file = self.output_name()
 
-
+        #treeEBName = "egRegDataEcalHLTV1"
+        #treeEEName = "egRegDataHGCALHLTV1"
         subprocess.Popen(["bin/"+arch+"/RegressionApplierExe",self.input_testing,self.applied_name(),"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--treeName",self.tree_name,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+        #subprocess.Popen(["bin/"+arch+"/RegressionApplier_newExe",self.input_testing,self.applied_name(),"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--ebName",treeEBName,"--eeName",treeEEName,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
 
         print ("made ",self.applied_name())
+
+
+    def run_eb_and_ee_new(self):
+
+        print('[INFO] Running function `run_eb_and_ee`')
+        if not os.path.isdir(self.out_dir):
+            os.mkdir(self.out_dir)
+
+
+        self.tree_name = "egRegDataEcalHLTV1"
+        self.do_eb = True
+        self.make_cfg()
+
+        # Get & set Scram arch
+        arch = os.getenv('SCRAM_ARCH')
+        print("[INFO] starting: {}".format(self.name()))
+        print("[INFO] Input arguments:\n\tcfg name: {}".format(self.cfg_name))
+        subprocess.Popen(["bin/"+arch+"/RegressionTrainerExe",self.cfg_name()]).communicate()
+        forest_eb_file = self.output_name()
+
+        self.tree_name = "egRegDataHGCALHLTV1"
+        self.do_eb = False
+        self.make_cfg()
+        print ("starting: {}".format(self.name()))
+        subprocess.Popen(["bin/"+arch+"/RegressionTrainerExe",self.cfg_name()]).communicate()
+        forest_ee_file = self.output_name()
+
+        #subprocess.Popen(["bin/"+arch+"/RegressionApplierExe",self.input_testing,self.applied_name(),"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--treeName",self.tree_name,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+
+        #treeEBName = "egRegDataEcalHLTV1"
+        #treeEEName = "egRegDataHGCALHLTV1"
+        treeEBName = "egRegDataEcalHLTV1"
+        treeEEName = "egRegDataHGCALHLTV1"     
+
+        subprocess.Popen(["bin/"+arch+"/RegressionApplier_newExe",self.input_testing,self.applied_name(),"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--treeName",self.tree_name,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+  
+        # HLTAnalyzerTree_IDEAL_Flat_train
+        # self.input_testing = self.input_testing.replace("Flat_test","Flat_photon_test")
+        # outfile_name = self.applied_name().replace("_applied","_applied_photon")
+        # subprocess.Popen(["bin/"+arch+"/RegressionApplier_newExe",self.input_testing,outfile_name,"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--ebName",treeEBName,"--eeName",treeEEName,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+        # self.input_testing = self.input_testing.replace("Flat_photon_test","Flat_electron_test")
+        # outfile_name = self.applied_name().replace("_applied","_applied_electron")
+        # subprocess.Popen(["bin/"+arch+"/RegressionApplier_newExe",self.input_testing,outfile_name,"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--ebName",treeEBName,"--eeName",treeEEName,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+
+        print ("made ",self.applied_name())
+
+
+    def run_eb_and_ee_new_offline(self):
+
+        print('[INFO] Running function `run_eb_and_ee`')
+        if not os.path.isdir(self.out_dir):
+            os.mkdir(self.out_dir)
+
+
+        self.tree_name = "egRegDataEcalV1"
+        self.do_eb = True
+        self.make_cfg()
+
+        # Get & set Scram arch
+        arch = os.getenv('SCRAM_ARCH')
+        print("[INFO] starting: {}".format(self.name()))
+        print("[INFO] Input arguments:\n\tcfg name: {}".format(self.cfg_name))
+        subprocess.Popen(["bin/"+arch+"/RegressionTrainerExe",self.cfg_name()]).communicate()
+        forest_eb_file = self.output_name()
+
+        self.tree_name = "egRegDataHGCALV1"
+        self.do_eb = False
+        self.make_cfg()
+        print ("starting: {}".format(self.name()))
+        subprocess.Popen(["bin/"+arch+"/RegressionTrainerExe",self.cfg_name()]).communicate()
+        forest_ee_file = self.output_name()
+
+        #subprocess.Popen(["bin/"+arch+"/RegressionApplierExe",self.input_testing,self.applied_name(),"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--treeName",self.tree_name,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+
+        treeEBName = "egRegDataEcalV1"
+        treeEEName = "egRegDataHGCALV1"     
+        
+        print(forest_ee_file,forest_eb_file)
+        subprocess.Popen(["bin/"+arch+"/RegressionApplier_newExe",self.input_testing,self.applied_name(),"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--ebName",treeEBName,"--eeName",treeEEName,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+  
+        # HLTAnalyzerTree_IDEAL_Flat_train
+        #self.input_testing = self.input_testing.replace("Flat_test","Flat_photon_test")
+        #outfile_name = self.applied_name().replace("_applied","_applied_photon")
+        #subprocess.Popen(["bin/"+arch+"/RegressionApplier_newExe",self.input_testing,outfile_name,"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--ebName",treeEBName,"--eeName",treeEEName,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+        #self.input_testing = self.input_testing.replace("Flat_photon_test","Flat_electron_test")
+        #outfile_name = self.applied_name().replace("_applied","_applied_electron")
+        #subprocess.Popen(["bin/"+arch+"/RegressionApplier_newExe",self.input_testing,outfile_name,"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--ebName",treeEBName,"--eeName",treeEEName,"--writeFullTree",self.write_full_tree,"--regOutTag",self.reg_out_tag]).communicate()
+
+        print ("made ",self.applied_name())
+
 
     def forest_filenames(self):
         do_eb_org = self.do_eb
